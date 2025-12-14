@@ -1,4 +1,6 @@
-# checksecc
+![](https://github.com/fuxxcss/checksecc/blob/main/docs/checksecc.png)
+--
+
 * [Why checksecc ?](#why)
 * [Introduction](#introduction)
 * [How to Install ?](#install)
