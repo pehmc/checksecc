@@ -1,21 +1,24 @@
-![](https://github.com/fuxxcss/checksecc/blob/main/docs/checksecc.png)
+![](./docs/checksecc.png)
 --
 
 * [Why checksecc ?](#why)
 * [Introduction](#introduction)
 * [How to Install ?](#install)
-* [How to Use ?](#check-one-elf-file)
+* [How to Use ?](#usage)
    * [Check File](#check-one-elf-file)
    * [Check Kernel](#check-the-kernel)
    * [Check Process](#check-one-process)
    * [Format Output](#format-output)
-* [Version](#version-information)
+* [Documents](#docs)
+* [Version](#version)
 * [ToDo](#todo)
 
-## why
+## Why
+
 checksec.sh is a linux specified gadget,because it used Shell and readelf. If you need to check pe, elf in other place, maybe you need checksecc.
 
-## introduction
+## Introduction
+
 The checksecc is a c rewrite of checksec and has some highlights. It retains all the core functionality of checksec,you can operate on it just like the original.we removed some uncommon features and added some useful features.
 ``` shell
 > checkc -h or just checkc
@@ -40,7 +43,8 @@ For more information, see:
 https://github.com/fuxxcss/checksecc
 ```
 
-## install 
+## Install
+
 install checksecc by release:
 ``` shell
 release 1.0 now.
@@ -55,7 +59,10 @@ if you need to update , make clean first
 make clean
 ```
 
-## check one elf file
+## Usage
+
+### check one elf file
+
 For example , we compile one file with gcc features.
 ``` shell
 > gcc -z now -fstack-protector-all test.c -o test
@@ -122,6 +129,7 @@ Frame Pointer               Not Omit
 ```
 
 ## check file list
+
 We need delim * to check file list
 ``` shell
 > checkc --file-list=test*test1*
@@ -146,7 +154,8 @@ Stripped                    Stripped
 Frame Pointer               NULL
 ```
 
-## check the kernel
+### check the kernel
+
 For example , we check Linux debian 5.10.0-20-amd64.
 ``` shell
 > checkc --kernel
@@ -162,7 +171,8 @@ SMAP                        Enabled
 PTI                         Enabled
 ```
 
-## check one process
+### check one process
+
 we focus on selinux and seccomp.
 ``` shell
 > ps -aux | grep upowerd
@@ -182,7 +192,8 @@ Stripped                    Stripped
 Frame Pointer               NULL
 ```
 
-## format output
+### format output
+
 cli is default.
 ``` shell
 > checkc --file=./test -format=csv
@@ -194,20 +205,25 @@ cli is default.
 {"./test":{"RELRO":"Partial RELRO","STACK CANARY":"No Canary found","NX":"NX enabled","PIE":"PIE enabled","RPATH":"NO RPATH","RUNPATH":"NO RUNPATH","Stripped":"Not Stripped","Frame Pointer":"Not Omit"}}
 ```
 
-## version information
+## Docs
+
+About memory mitigation strategies:
+- [binary formats](./docs/formats.md)
+- [binary loading](./docs/loading.md)
+- [mitigation strategies](./docs/mitigations.md)
+
+## Version
+
 ``` shell
 > checkc -v
 checksecc v1.0,fuxxcss
 https://github.com/fuxxcss/checksecc
-
 ```
 
 ## ToDo
+
 todo in version 2.0:
 ``` shell
 1. `pe` check
 2. `windows` check
 ```
-
-
-
