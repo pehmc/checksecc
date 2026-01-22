@@ -52,6 +52,18 @@ void link_append(Link *link, void *data) {
     link->tail = l;
 }
 
+void link_insert(Link *link, void *data) {
+
+    LinkNode *l = MALLOC(1, LinkNode);
+    l->data = data;
+
+    /*  not empty link  */
+    if (link->head) {
+        l->next = link->head;
+    }
+    link->head = l;
+}
+
 typedef struct hashmap{
     bool hit;
     char *str;
@@ -79,7 +91,26 @@ void hashmap_append(hashmap *hm, bool hit, char *str) {
     (hm + index)->next = new;
 }
 
-void hashmap_search()
+hashmap *hashmap_search(hashmap *hm, char *str) {
+
+    size_t len = strlen(str);
+    size_t index = (len * len) % HASHMAP_SIZE;
+
+    hashmap *hm_link = (hm + index)->next;
+    hashmap *ret = NULL;
+
+    while (hm_link) {
+
+        if (strcmp(hm_link->str, str) == 0) {
+                
+            ret = hm_link;
+            break;
+        }
+        hm_link = hm_link->next;
+    }
+
+    return ret;
+}
 
 void hashmap_free(hashmap *hm){
 

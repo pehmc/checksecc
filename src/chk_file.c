@@ -39,7 +39,7 @@ char *chk_elf_relro(Binary *elf) {
         /*  segment type == GNU_RELRO*/
         if (ph->sgm_type == PH_GNU_RELRO) {
 
-            relro=true;
+            relro = true;
             break;
         }
 
@@ -529,7 +529,7 @@ void chk_elf_sanitized(Binary *elf, Link *info) {
         /*  compare strlen(san_str[.]) bytes */
         for (int i = 0; i < CHK_SAN_NUM; i++) {
 
-            char *str = str_colored("__%s", san_str[i]);
+            char *str = str_append("__", san_str[i]);
             size_t size = strlen(str);
 
             if (strncmp(name, str, size) == 0) {
@@ -585,13 +585,13 @@ void chk_elf_sanitized(Binary *elf, Link *info) {
     cet_boolean[1] = false;
 
     /*  san format  */
-    char *type = "Sanitized %s";
+    char *type = "Sanitized ";
 
     /* loop san  */
     for (int i = 0; i < CHK_SAN_NUM; i++) {
 
         chk_info *san_info = MALLOC(1, chk_info);
-        san_info->chk_type = str_colored(type, san_str[i]);
+        san_info->chk_type = str_append(type, san_str[i]);
 
         if (san_boolean[i] ==false) san_info->chk_result = str_colored(RED_FMT, "NO");
         else san_info->chk_result = str_colored(GREEN_FMT, "Yes");
@@ -602,7 +602,7 @@ void chk_elf_sanitized(Binary *elf, Link *info) {
     for (int i = 0; i < CHK_CET_NUM; i++) {
 
         chk_info *cet_info = MALLOC(1, chk_info);
-        cet_info->chk_type = str_colored(type, cet_str[i]);
+        cet_info->chk_type = str_append(type, cet_str[i]);
 
         if (cet_boolean[i] ==false) cet_info->chk_result = str_colored(RED_FMT, "NO");
         else cet_info->chk_result = str_colored(GREEN_FMT, "Yes");
@@ -698,17 +698,17 @@ void chk_elf_fortified(Binary *elf, Link *info) {
 
     /*  lib path    */
     char *lib_path[CHK_LIB_PATH_NUM] = {
-        "/lib%s",
-        "/lib64%s",
-        "/lib32%s"
+        "/lib",
+        "/lib64",
+        "/lib32"
     };
 
     /*  load libc version, indexing by bin_arch*/
     char *arch_path[CHK_LIBC_PATH_NUM] = {
         /*  ARCH_X86 = 0    */
-        "/i386-linux-gnu/%s",
-        "/x86_64-linux-gnu/%s",
-        "/aarch64-linux-gnu/%s"
+        "/i386-linux-gnu/",
+        "/x86_64-linux-gnus",
+        "/aarch64-linux-gnu/"
     };
 
     char *libc_path = NULL;
@@ -720,8 +720,8 @@ void chk_elf_fortified(Binary *elf, Link *info) {
 
     for(int num = 0; num < CHK_LIB_PATH_NUM; num++) {
 
-        libc_path = str_colored(lib_path[num], arch_path[elf->bin_arch]);
-        libc_path = str_colored(libc_path, libc_version);
+        libc_path = str_append(lib_path[num], arch_path[elf->bin_arch]);
+        libc_path = str_append(libc_path, libc_version);
 
         /*  load libc   */
         libc = load_binary(libc_path);
@@ -759,8 +759,7 @@ void chk_elf_fortified(Binary *elf, Link *info) {
     }
 
     /*  return chk_info    */
-    char *type = "Fortified %s";
-    chk_info *info=MALLOC(1,chk_info);
+    char *type = "Fortified ";
 
     /*  compare elf funcs with libc funcs   */
     /*  count fortified */
@@ -768,60 +767,59 @@ void chk_elf_fortified(Binary *elf, Link *info) {
     sym_link = elf->sym->head;
 
     while (sym_link) {
-
-        char *prefix = "__";
+        
         Symbol sym = sym_link->data;
         char *elf_func_str = sym->sym_name;
 
-        size_t elf_func_len = strlen(elf_func_str);
-        size_t map_index=(elf_func_len*elf_func_len)%HASHMAP_SIZE;
         /*  search in hashmap   */
-        hashmap *hm_tmp=(hm+map_index)->_next;
-        while(hm_tmp){
-            /*  fortified  */
-            if(strcmp(hm_tmp->_str,elf_func_str)==0){
-                fortified_count++;
-                if(!hm_tmp->_hit){
-                    hm_tmp->_hit=true;
-                    chk_info *new=MALLOC(1,chk_info);
-                    new->chk_type=type;
-                    new->chk_result=str_append(hm_tmp->_str," \033[32mFortified\033[m");
-                    info->chk_next=new;
-                    info=new;
-                }
+        hashmap *ret = hashmap_search(hm, elf_func_str);
+
+        /*  foritfied  */
+        if (ret) {
+
+            fortified_count++;
+
+            if (!ret->hit) {
+
+                ret->hit = true;
+                chk_info *fort_info = MALLOC(1, chk_info);
+                fort_info->chk_type = type;
+                fort_info->chk_result = str_append(ret->str, str_colored(GREEN_FMT, "Fortified"));
+
+                link_append(info, fort_info);
             }
-            hm_tmp=hm_tmp->_next;
         }
-        elf_sym=elf_sym->sym_next;
+
+        sym_link = sym_link->sym_next;
     }
-    /*  tail    */
-    info->chk_next=NULL;
+    
     /*  free hashmap and libc   */
     free_hashmap(hm);
     free_binary(libc);
-    /*  head insert */
-    chk_info *insert=head;
-    /*  first info : whether libc has FORTIFY SOURCE    */
-    chk_info *libc_info=MALLOC(1,chk_info);
-    libc_info->chk_type=type;
-    char *first_info="FORTIFY SOURCE support available (";
-    first_info=str_append(first_info,libc_path);
-    if(fortify_count) libc_info->chk_result=str_append(first_info,") : \033[32mYes\033[m");
-    else libc_info->chk_result=str_append(first_info,") : \033[31mNO\033[m");
-    libc_info->chk_next=insert->chk_next;
-    insert->chk_next=libc_info;
-    insert=libc_info;
-    /*  second info : whether target is fortified   */
-    chk_info *target_info=MALLOC(1,chk_info);
-    target_info->chk_type=type;
-    char *second_info="Binary compiled with FORTIFY SOURCE support (";
-    second_info=str_append(second_info,elf->bin_name);
-    if(fortified_count) target_info->chk_result=str_append(second_info,") : \033[32mYes\033[m");
-    else target_info->chk_result=str_append(second_info,") : \033[31mNO\033[m");
-    target_info->chk_next=insert->chk_next;
-    insert->chk_next=target_info;
 
-    return head;
+    /*  head insert second info : whether target is fortified  */
+    chk_info *second_info = MALLOC(1,chk_info);
+    second_info->chk_type = type;
+
+    char *second_result = "Binary compiled with FORTIFY SOURCE support (%s) : ";
+    second_result = str_colored(second_result, elf->bin_name);
+
+    if(fortify_count) second_info->chk_result = str_append(second_result, str_colored(GREEN_FMT, "Yes");
+    else second_info->chk_result = str_append(second_result, str_colored(RED_FMT, "NO");
+
+    link_insert(info, second_info);
+
+    /*  head insert first info: whether libc has FORTIFY SOURCE  */
+    chk_info *first_info = MALLOC(1, chk_info);
+    first_info->chk_type = type;
+
+    char *first_result = "FORTIFY SOURCE support available (%s) : ";
+    first_result = str_colored(first_result, libc_path);
+
+    if(fortify_count) first_info->chk_result = str_append(first_result, str_colored(GREEN_FMT, "Yes");
+    else first_info->chk_result = str_append(first_result, str_colored(RED_FMT, "NO");
+
+    link_insert(info, first_info);
 }
 
 void chk_file_one_elf(Binary *elf, Link *info) {

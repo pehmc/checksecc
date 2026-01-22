@@ -83,5 +83,6 @@ void format_output(Link *info);
 
 /*  str append  */
 char *str_colored(char *color, char *str);
+char *str_append(char *des, char *src);
 
 #endif

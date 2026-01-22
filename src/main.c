@@ -154,7 +154,7 @@ int main(int argc, char **argv) {
         break;
     case CHK_UNKNOWN:
         printf(str_colored(RED_FMT, "Error:Unknown check function."));
-        printf("\n\n");
+        CHK_PRINT3();
         break;
     }
 
