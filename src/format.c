@@ -7,6 +7,7 @@
 #include "functions.h"
 #include "types.h"
 #include "loader.h"
+#include "structs.h"
 
 /*  global flag   */
 bool EXTENTED;
@@ -206,6 +207,8 @@ void free_str(){
         LinkNode *tmp = head;
         head = head->next;
 
+        strlink *data = tmp->data; 
+        free(data->str);
         free(tmp->data);
         free(tmp);
     }

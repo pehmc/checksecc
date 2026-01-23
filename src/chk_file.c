@@ -11,6 +11,7 @@
 #include "functions.h"
 #include "types.h"
 #include "loader.h"
+#include "structs.h"
 
 /*  global flag */
 extern bool EXTENTED;
@@ -707,7 +708,7 @@ void chk_elf_fortified(Binary *elf, Link *info) {
     char *arch_path[CHK_LIBC_PATH_NUM] = {
         /*  ARCH_X86 = 0    */
         "/i386-linux-gnu/",
-        "/x86_64-linux-gnus",
+        "/x86_64-linux-gnu/",
         "/aarch64-linux-gnu/"
     };
 
@@ -768,7 +769,7 @@ void chk_elf_fortified(Binary *elf, Link *info) {
 
     while (sym_link) {
         
-        Symbol sym = sym_link->data;
+        Symbol *sym = sym_link->data;
         char *elf_func_str = sym->sym_name;
 
         /*  search in hashmap   */
@@ -784,17 +785,17 @@ void chk_elf_fortified(Binary *elf, Link *info) {
                 ret->hit = true;
                 chk_info *fort_info = MALLOC(1, chk_info);
                 fort_info->chk_type = type;
-                fort_info->chk_result = str_append(ret->str, str_colored(GREEN_FMT, "Fortified"));
+                fort_info->chk_result = str_append(ret->str, str_colored(GREEN_FMT, " Fortified"));
 
                 link_append(info, fort_info);
             }
         }
 
-        sym_link = sym_link->sym_next;
+        sym_link = sym_link->next;
     }
     
     /*  free hashmap and libc   */
-    free_hashmap(hm);
+    hashmap_free(hm);
     free_binary(libc);
 
     /*  head insert second info : whether target is fortified  */
@@ -804,8 +805,8 @@ void chk_elf_fortified(Binary *elf, Link *info) {
     char *second_result = "Binary compiled with FORTIFY SOURCE support (%s) : ";
     second_result = str_colored(second_result, elf->bin_name);
 
-    if(fortify_count) second_info->chk_result = str_append(second_result, str_colored(GREEN_FMT, "Yes");
-    else second_info->chk_result = str_append(second_result, str_colored(RED_FMT, "NO");
+    if(fortify_count) second_info->chk_result = str_append(second_result, str_colored(GREEN_FMT, "Yes"));
+    else second_info->chk_result = str_append(second_result, str_colored(RED_FMT, "NO"));
 
     link_insert(info, second_info);
 
@@ -816,8 +817,8 @@ void chk_elf_fortified(Binary *elf, Link *info) {
     char *first_result = "FORTIFY SOURCE support available (%s) : ";
     first_result = str_colored(first_result, libc_path);
 
-    if(fortify_count) first_info->chk_result = str_append(first_result, str_colored(GREEN_FMT, "Yes");
-    else first_info->chk_result = str_append(first_result, str_colored(RED_FMT, "NO");
+    if(fortify_count) first_info->chk_result = str_append(first_result, str_colored(GREEN_FMT, "Yes"));
+    else first_info->chk_result = str_append(first_result, str_colored(RED_FMT, "NO"));
 
     link_insert(info, first_info);
 }

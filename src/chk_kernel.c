@@ -10,6 +10,7 @@
 #include "functions.h"
 #include "types.h"
 #include "loader.h"
+#include "structs.h"
 
 /*  global flag */
 extern bool DEBUG;

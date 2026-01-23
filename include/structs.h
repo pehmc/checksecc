@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 /*  safe malloc */
 #define MALLOC(num, type) ({\
@@ -28,41 +29,10 @@ typedef struct {
     LinkNode *tail;    
 }Link;
 
-/*  link funcs  */
-Link *link_init() {
+Link *link_init();
+void link_append(Link *link, void *data);
+void link_insert(Link *link, void *data);
 
-    Link *l = MALLOC(1, Link);
-    l->head = NULL;
-    l->tail = NULL;
-    return l;
-}
-
-void link_append(Link *link, void *data) {
-
-    LinkNode *l = MALLOC(1, LinkNode);
-    l->data = data;
-    l->next = NULL;
-
-    /*  empty link  */
-    if (!link->head) {
-        link->head = l;
-    } else {
-        link->tail->next = l;
-    }
-    link->tail = l;
-}
-
-void link_insert(Link *link, void *data) {
-
-    LinkNode *l = MALLOC(1, LinkNode);
-    l->data = data;
-
-    /*  not empty link  */
-    if (link->head) {
-        l->next = link->head;
-    }
-    link->head = l;
-}
 
 typedef struct hashmap{
     bool hit;
@@ -70,62 +40,9 @@ typedef struct hashmap{
     struct hashmap *next;
 }hashmap;
 
-hashmap *hashmap_init() {
-
-    hashmap *hm = MALLOC(HASHMAP_SIZE, hashmap);
-    for (int i=0;i<HASHMAP_SIZE;i++) {
-        (hm + i)->next=NULL;
-    }
-}
-
-void hashmap_append(hashmap *hm, bool hit, char *str) {
-
-    size_t len = strlen(str);
-    size_t index = (len * len) % HASHMAP_SIZE;
-    
-    hashmap *new = MALLOC(1, hashmap);
-    new->hit = hit;
-    new->str = str;
-
-    new->next = (hm + index)->next;
-    (hm + index)->next = new;
-}
-
-hashmap *hashmap_search(hashmap *hm, char *str) {
-
-    size_t len = strlen(str);
-    size_t index = (len * len) % HASHMAP_SIZE;
-
-    hashmap *hm_link = (hm + index)->next;
-    hashmap *ret = NULL;
-
-    while (hm_link) {
-
-        if (strcmp(hm_link->str, str) == 0) {
-                
-            ret = hm_link;
-            break;
-        }
-        hm_link = hm_link->next;
-    }
-
-    return ret;
-}
-
-void hashmap_free(hashmap *hm){
-
-    for(int i = 0; i < HASHMAP_SIZE; i++) {
-
-        hashmap *head = (hm + i)->next;
-
-        while (head) {
-            hashmap *tmp = head;
-            head = head->next;
-
-            free(tmp);
-        }
-    }
-    free(hm);
-}
+hashmap *hashmap_init();
+void hashmap_append(hashmap *hm, bool hit, char *str);
+hashmap *hashmap_search(hashmap *hm, char *str);
+void hashmap_free(hashmap *hm);
 
 #endif

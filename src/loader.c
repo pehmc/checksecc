@@ -649,10 +649,9 @@ Binary *load_binary(char *fn) {
         load_elf(bin);
         break;
 
-    case BIN_FORMAT_PE:
-
-        load_pe(bin);
-        break;
+    // case BIN_FORMAT_PE:
+    //    load_pe(bin);
+    //    break;
     }
 
     /*  load elf/pe error  */

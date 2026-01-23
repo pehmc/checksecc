@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include "functions.h"
 #include "types.h"
+#include "structs.h"
 
 /*  usage   */
 static void help() {
