@@ -1,12 +1,15 @@
-#include<fcntl.h>
-#include<unistd.h>
-#include<string.h>
-#include<sys/utsname.h>
-#include<zlib.h>
+// Copyright (c) 2024 pehmc. MIT License.
+// See LICENSE file in the project root for full license information.
+
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/utsname.h>
+#include <zlib.h>
 #include <stdbool.h>
-#include"functions.h"
-#include"types.h"
-#include"loader.h"
+#include "functions.h"
+#include "types.h"
+#include "loader.h"
 
 /*  global flag */
 extern bool DEBUG;

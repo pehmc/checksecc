@@ -40,7 +40,7 @@ Usage: checkc [OPTION] [--format={cli,csv,xml,json}]
       --extended
 
 For more information, see:
-https://github.com/fuxxcss/checksecc
+https://github.com/pehmc/checksecc
 ```
 
 ## Install
@@ -216,8 +216,8 @@ About memory mitigation strategies:
 
 ``` shell
 > checkc -v
-checksecc v1.0,fuxxcss
-https://github.com/fuxxcss/checksecc
+checksecc v1.0,pehmc
+https://github.com/pehmc/checksecc
 ```
 
 ## ToDo

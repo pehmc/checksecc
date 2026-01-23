@@ -1,0 +1,38 @@
+1.str append
+
+COLOR = "[/m %s [/m"
+
+const char *format = "[/m %s [/m";
+    const char *str = "str";
+    
+
+    int needed_size = snprintf(NULL, 0, format, str);
+    if (needed_size < 0) {
+
+        return 1;
+    }
+    
+
+    char *buffer = malloc(needed_size + 1);
+    if (buffer == NULL) {
+
+        return 1;
+    }
+    
+
+    int written = snprintf(buffer, needed_size + 1, format, str);
+    if (written != needed_size) {
+
+    }
+    
+    printf("Result: %s\n", buffer);
+    
+    free(buffer);
+    return 0;
+
+
+3. read file ,how to set buffer?
+
+5. hashmap
+
+6. switch
